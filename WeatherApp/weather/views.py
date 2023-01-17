@@ -9,8 +9,20 @@ def index(request):
 
     if request.method == 'POST':
         form = CityForm(request.POST)
-        form.save()
+        if form.is_valid():
+            form.save()
     form = CityForm()
+
+    city_one = request.POST.get('name')
+    res = requests.get(url.format(city_one)).json()
+    if res['cod'] != '404':
+        city_one_info = {
+            'city': city_one,
+            'temp': res['main']['temp'],
+            'icon': res['weather'][0]['icon'],
+        }
+    else:
+        city_one_info = None
 
     cities = City.objects.all()
 
@@ -18,17 +30,20 @@ def index(request):
 
     for city in cities:
         res = requests.get(url.format(city.name)).json()
-        city_info = {
-            'city': city.name,
-            'temp': res['main']['temp'],
-            'icon': res['weather'][0]['icon'],
-        }
-
-        all_cities.append(city_info)
+        if res['cod'] != '404':
+            city_info = {
+                'city': city.name,
+                'temp': res['main']['temp'],
+                'icon': res['weather'][0]['icon'],
+            }
+            all_cities.append(city_info)
+        else:
+            City.objects.filter(name=city).delete()
 
     context = {
         'all_info': all_cities,
         'form': form,
+        'city_one': city_one_info,
     }
 
     return render(request, 'weather/index.html', context)

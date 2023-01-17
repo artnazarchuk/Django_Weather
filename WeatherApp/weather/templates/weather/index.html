@@ -27,6 +27,15 @@
                     {{ form.name }}
                     <input type="submit" name="send" value="Узнать" class="mt-2 btn btn-danger">
                 </form>
+                <br>
+                {% if city_one.city is not None %}
+                    <div class="alert alert-info">
+                        {{ city_one.city }}
+                        {{ city_one.temp }}°C
+                        <img src="https://openweathermap.org/img/w/{{ city_one.icon }}.png" alt="Фото погоды"
+                             class="img-thunbnail">
+                    </div>
+                {% endif %}
             </div>
             <div class="col-4 offset-1">
                 <h1>Информация</h1>
